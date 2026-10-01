@@ -17,7 +17,9 @@ postgres:
   credentials:
     database: notesdb
     user: postgres
-    password: devops123    # sobreescribir en prod con --set
+    password: devops123    # solo laboratorio local; producción usa Secret externo
+    secretName: postgres-secret
+    createSecret: true
   storage:
     size: 1Gi
   resources:

@@ -161,6 +161,50 @@ data:
               summary: "Tasa de errores HTTP alta"
               description: "Más del 5% de las solicitudes HTTP de la API Flask están fallando."
 
+          # Basada en app_requests_total, métrica existente de la API (no del Ingress).
+          - alert: IngressPicoErrores4xx5xx
+            expr: sum(rate(app_requests_total{status=~"4..|5.."}[2m])) > 10
+            for: 1m
+            labels:
+              severity: warning
+              category: ciberseguridad
+            annotations:
+              summary: "Pico de errores HTTP en la Notes App"
+              description: "La API registra más de 10 respuestas 4xx/5xx por segundo."
+
+          # Requiere kube-state-metrics; el stack actual no incluye su scrape.
+          - alert: PodReiniciosFrecuentesSeguridad
+            expr: increase(kube_pod_container_status_restarts_total{namespace="devops-portfolio"}[5m]) > 2
+            for: 1m
+            labels:
+              severity: warning
+              category: infraestructura
+            annotations:
+              summary: "Reinicios frecuentes de Pods"
+              description: "El contenedor {{ $labels.container }} del Pod {{ $labels.pod }} se reinició más de dos veces en cinco minutos."
+
+          # app_requests_total contiene status; el backend actual no tiene login/auth.
+          - alert: InvasionIntentosAuthFallidos
+            expr: sum(rate(app_requests_total{status="401"}[2m])) > 5
+            for: 30s
+            labels:
+              severity: critical
+              category: aplicacion
+            annotations:
+              summary: "Intentos de autenticación fallidos"
+              description: "Se observan respuestas HTTP 401 repetidas; validar al instrumentar login."
+          # Mejora futura: app_auth_failures_total{endpoint=...}.
+
+          - alert: PicoErroresConexionBaseDatos
+            expr: sum(rate(app_db_errors_total[2m])) > 2
+            for: 30s
+            labels:
+              severity: critical
+              category: persistencia
+            annotations:
+              summary: "Pico de errores de conexión a PostgreSQL"
+              description: "La API registró errores repetidos contra la base de datos."
+
           # Alerta si el disco supera el 85% de capacidad
           - alert: DiskSpaceLow
             expr: >-

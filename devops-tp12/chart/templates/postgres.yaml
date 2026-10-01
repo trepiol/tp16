@@ -39,7 +39,7 @@ spec:
             - containerPort: 5432
           envFrom:
             - secretRef:
-                name: postgres-secret
+                name: {{ .Values.postgres.credentials.secretName | default "postgres-secret" }}
           readinessProbe:
             exec:
               command: ["pg_isready", "-U", "{{ .Values.postgres.credentials.user }}"]

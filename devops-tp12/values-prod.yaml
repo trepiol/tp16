@@ -1,0 +1,19 @@
+# TP16 render profile. Credentials are provisioned as a Kubernetes Secret.
+global:
+  environment: production
+postgres:
+  credentials:
+    secretName: tp16-postgres-credentials
+    createSecret: false
+    user: notes_app
+    database: notesdb
+backend:
+  image:
+    repository: tp16-notes-backend
+    tag: render-only
+    pullPolicy: IfNotPresent
+frontend:
+  image:
+    repository: notes-frontend
+    tag: external
+    pullPolicy: IfNotPresent
