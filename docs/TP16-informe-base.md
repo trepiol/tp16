@@ -1,6 +1,6 @@
 # TP16 — Informe base
 
-> Reemplazar los marcadores `[pendiente]` por salidas reales del laboratorio. Cada sección está separada para poder iniciar en una página al exportar a PDF.
+> Evidencia del TP16 ejecutado en la VM. Cada sección está separada para poder iniciar en una página al exportar a PDF.
 
 <div style="page-break-after: always"></div>
 
@@ -10,6 +10,8 @@
 - Prompt observado: `alumno@debian:~/tp16$`.
 - Comandos de auditoría: `pwd`, `whoami`, `hostname`, `git status --short --branch`, `git branch --show-current`, `git remote -v`, `git log -5 --oneline`.
 - Render: `helm lint devops-tp12/chart -f devops-tp12/values-prod.yaml`; `helm template tp16 devops-tp12/chart -f devops-tp12/values-prod.yaml > manifests-rendered-prod.yaml`.
+- Validación: `kubectl apply --dry-run=client -f manifests-rendered-prod.yaml`; los 10 objetos se aceptaron en dry-run.
+- Trivy: `bash scripts/preparar-trivy-sca.sh` prepara SCA combinado; también se escanearon imagen backend, YAML renderizado, secretos backend y Terraform.
 - Trivy 0.74.0; DB actualizada 2026-09-30. Instalación Aqua validada; apt update global encontró firma faltante en repo HashiCorp, por lo que se aisló el repo Trivy.
 - helm lint pasó (aviso informativo: icono recomendado); Helm produjo 10 objetos/documentos YAML válidos sin Secret. Flake8 pasó; pytest 7/7, cobertura 90%.
 
@@ -57,7 +59,7 @@
 
 - Mensaje observado: CVE-2024-1135 para gunicorn 21.2.0, severidad HIGH; Trivy informa versión corregida 22.0.0.
 - La vulnerabilidad afecta el servidor WSGI incluido en el backend. También aparece CVE-2024-6827 para esa versión.
-- El escaneo de requirements detecta además CVE-2024-6221 en flask-cors 4.0.0. La imagen encontró 50 HIGH Debian más 3 HIGH Python.
+- El escaneo de requirements detecta además CVE-2024-6221 en flask-cors 4.0.0. La imagen reconstruida encontró 50 HIGH Debian más 3 HIGH Python; su gate devolvió exit code 1. El gate SCA combinado y el gate IaC también devolvieron exit code 1. El escaneo de secretos del backend reportó 0 findings.
 - No se actualizaron paquetes ni se remedió ningún finding; el escaneo no se usó para afirmar remediación.
 - Si Trivy devuelve exit code 1, el gate encontró una issue que cumple el umbral; no equivale a que el análisis haya fallado técnicamente.
 
