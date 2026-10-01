@@ -9,3 +9,13 @@ semgrep.sarif
 __pycache__/
 .pytest_cache/
 *.pyc
+
+# TP16 generated reports and image artifacts
+trivy-*.json
+trivy-*.txt
+trivy-cache/
+.cache/trivy/
+dist/backend-image.tar
+
+.coverage
+.trivy-sca/
