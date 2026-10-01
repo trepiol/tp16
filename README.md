@@ -282,16 +282,17 @@ No se analiza `chart/templates/` directamente: Helm debe resolver primero las pl
 
 ```bash
 bash scripts/preparar-trivy-sca.sh
-trivy fs --scanners vuln,secret --severity HIGH,CRITICAL .trivy-sca
-trivy fs --scanners vuln,secret --format json --output trivy-fs-report.json .trivy-sca
+trivy fs --scanners vuln --severity HIGH,CRITICAL .trivy-sca
+trivy fs --scanners secret --severity HIGH,CRITICAL devops-tp12/app/backend
+trivy fs --scanners vuln --format json --output trivy-fs-report.json .trivy-sca
 
 docker build -t tp16-notes-backend:local devops-tp12/app/backend
 trivy image --severity HIGH,CRITICAL tp16-notes-backend:local
 trivy config manifests-rendered-prod.yaml
-trivy config guia-11/
+trivy config --misconfig-scanners terraform guia-11/
 ```
 
-El inventario SCA combina requirements.txt y requirements-dev.txt en una ruta temporal porque Trivy reconoce requirements.txt, pero no descubre el archivo requirements-dev.txt directamente. El archivo temporal está excluido de Git. El escaneo de Terraform se ejecuta y se documenta con sus hallazgos. El alcance obligatorio de imagen en esta entrega es el backend. Como V2 conviene escanear también frontend y todas las imágenes efectivamente desplegadas.
+El inventario SCA combina requirements.txt y requirements-dev.txt en una ruta temporal porque Trivy reconoce requirements.txt, pero no descubre el archivo requirements-dev.txt directamente. El escaneo de secretos corre aparte sobre el backend fuente. El archivo temporal está excluido de Git. El escaneo de Terraform se ejecuta y se documenta con sus hallazgos. El alcance obligatorio de imagen en esta entrega es el backend. Como V2 conviene escanear también frontend y todas las imágenes efectivamente desplegadas.
 
 ## Pipeline, Andon Cord y artifacts
 
